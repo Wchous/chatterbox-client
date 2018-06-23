@@ -5,6 +5,8 @@
 //   //roomname: '4chan'
 // };
 
+const currentChats = [];
+
 function submitMessage(message) {
   
     $.ajax({
@@ -36,6 +38,20 @@ function addChatroom(text) {
   a.add(option);
   
 }
+
+function selectChatroom(chatroom) { //onclick
+  var selectedRoom = chatroom.text();
+  populateChats(selectedRoom);
+  
+}
+
+// need onclick handler to enter chatroom
+  // select text from enter/ed or chosen chatroom
+  // filter chats by room name
+  // display chats
+  
+  
+// ONCLICK HANDLER FOR SUBMIT BUTTON TO RUN SELECTCHATROOM
 
 // $.ajax({
 //   //dataType: "JSON",
@@ -92,22 +108,50 @@ function getNewMessages (){
   // contentType: ,
   success: function(data) {
     //console.log(data.results);
-    let array = data.results;
+    window.currentChats = data.results;
     let approvedMessages = [];
+    console.log(`approvedMessages: ${approvedMessages}`);
     
-    for (let i = 0; i < 20; i++) {
-      if (!isMalicious(array[i])) {
-        approvedMessages.push(array[i]);
-      }
+    let i = 0;
+    while (approvedMessages.length < 20) {
+      
+      // for (let chat of window.currentChats) 
+        if (!isMalicious(window.currentChats[i])) {
+          approvedMessages.push(window.currentChats[i]);
+        }
+        i++;
     }
+      
+    
+    // for (let i = 0; i < 20; i++) {
+    //   if (!isMalicious(array[i])) {
+    //     approvedMessages.push(array[i]);
+    //   }
+    // }
     
     for (let message of approvedMessages) {    
-      $('#chats').append(`<a>${JSON.stringify(message)}</a>`);
+      $('#chats').append(`<div class="postedMessages">${JSON.stringify(message)}</div>`);
     }
-    $("a").addClass("postedMessages")
-    }
-  });
+  }
+});
 }
+
+function populateChats(chatroom) {
+  
+  let chatsByRoomname = window.currentChats.filter(function(chat) {
+    return chat.roomname === chatroom;
+  });
+  
+  for (let messages of chatsByRoomname) {
+      if (!isMalicious(array[i])) {
+        $('#chats').append(`<div class="postedMessages">${JSON.stringify(message)}</div>`);
+    }
+  }
+}
+
+
+// need onclick handler to call 
+
 //setInterval(getNewMessages, 5000);
 getNewMessages();
 
