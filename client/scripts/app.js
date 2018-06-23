@@ -1,13 +1,15 @@
 // YOUR CODE HERE:
-// var message = {
-//   username: 'Will',
-//   text: 'Hello from the other side',
-//   //roomname: '4chan'
-// };
+
+let app = {};
+app.init = function() {
+  app.fetch();
+  //setInterval(app.fetch(), 5000);
+};
 
 const currentChats = [];
+let username;
 
-function submitMessage(message) {
+app.send = function(message) {
   
     $.ajax({
     // This is the url you should use to communicate with the parse API server.
@@ -25,66 +27,22 @@ function submitMessage(message) {
   });
 }
 
-$('button').on('click', function() {
-  let message = $(this).closest('form').find('#inputPosts').text();
-  submitMessage(message);
-  
-});
-
 function addChatroom(text) {
   var x = document.getElementById('chatroomMenu');
   var option = document.createElement('option');
   option.text = text;
-  a.add(option);
-  
+  x.add(option);
+  return option;
 }
 
 function selectChatroom(chatroom) { //onclick
-  var selectedRoom = chatroom.text();
-  populateChats(selectedRoom);
-  
+  //var selectedRoom = chatroom.text();
+  // $(`select>option:eq(4)`).prop('selected', true);
+  //selectElement.text = selectedRoom;
+  //app.fetch();
+  populateChatsByChatroom(chatroom);
 }
 
-// need onclick handler to enter chatroom
-  // select text from enter/ed or chosen chatroom
-  // filter chats by room name
-  // display chats
-  
-  
-// ONCLICK HANDLER FOR SUBMIT BUTTON TO RUN SELECTCHATROOM
-
-// $.ajax({
-//   //dataType: "JSON",
-//   url: 'http://parse.atx.hackreactor.com/chatterbox/classes/messages',
-//   type: "GET",
-//   // data: ,
-//   // contentType: ,
-//   success: function(data) {
-//     //console.log(data.results);
-//     let array = data.results.reverse();
-//     let approvedMessages = [];
-    
-//     for (let i = 0; i < 20; i++) {
-//       let malicious = false;
-//       for (let key in array[i]) {
-//         if (array[i][key].includes('<script>')) {
-//           malicious = true;
-//         }
-//       }
-//       if (!malicious) {
-//         approvedMessages.push(array[i]);
-//       }
-
-//     }
-//     for (let message of approvedMessages) {
-//       $('#chats').append(`<div>${JSON.stringify(message)}</div>`);
-//     }
-    
-//     // return data.results;
-    
-//     // $('#chats').append(JSON.stringify(data));
-//   }
-// });
 function isMalicious(tweet) {
   for (let key in tweet) {
     if (tweet[key].includes('<script>') || tweet[key].includes('src')) {
@@ -94,8 +52,7 @@ function isMalicious(tweet) {
   return false;
 }
 
-
-function getNewMessages (){
+app.fetch = function(){
   $(".postedMessages").remove();
   
   $.ajax({
@@ -110,51 +67,78 @@ function getNewMessages (){
     //console.log(data.results);
     window.currentChats = data.results;
     let approvedMessages = [];
-    console.log(`approvedMessages: ${approvedMessages}`);
     
     let i = 0;
     while (approvedMessages.length < 20) {
       
       // for (let chat of window.currentChats) 
-        if (!isMalicious(window.currentChats[i])) {
-          approvedMessages.push(window.currentChats[i]);
-        }
-        i++;
+      if (!isMalicious(window.currentChats[i])) {
+        approvedMessages.push(window.currentChats[i]);
+      }
+      i++;
     }
       
-    
-    // for (let i = 0; i < 20; i++) {
-    //   if (!isMalicious(array[i])) {
-    //     approvedMessages.push(array[i]);
-    //   }
-    // }
-    
     for (let message of approvedMessages) {    
-      $('#chats').append(`<div class="postedMessages">${JSON.stringify(message)}</div>`);
+      // $('#chats').append(`<div class="postedMessages">${JSON.stringify(message)}</div>`);
+      
+          $('#chats').append(`<div class="postedMessages">
+          <button class="username">${message.username}</button>
+          <span>${message.text}</span>
+          <div>chatroom:</div>
+          <button class = "room">${message.roomname}</button>
+          <div>sent at ${message.createdAt.substring(0, 19)}</div>
+          </div>`);
+      
+      
+      //${JSON.stringify(message)}
+      
     }
   }
 });
 }
 
-function populateChats(chatroom) {
+
+function populateChatsByFriends(username) {
+  $(".postedMessages").remove(); //MAYBE DELETE
+  
+  let selectedFriendChats = window.currentChats.filter(function(chat) {
+    return chat.username === username;
+  });
+  
+  for (let message of selectedFriendChats) {
+      if (!isMalicious(message)) {
+        
+          $('#chats').append(`<div class="postedMessages">
+          <button class="username">${message.username}</button>
+          <span>${message.text}</span>
+          <div>chatroom:</div>
+          <button class = "room">${message.roomname}</button>
+          <div>sent at ${message.createdAt.substring(0, 19)}</div>
+          </div>`);
+    }
+  }
+  
+}
+
+function populateChatsByChatroom(chatroom) {
+  $('.postedMessages').remove(); //MAYBE DELETE
   
   let chatsByRoomname = window.currentChats.filter(function(chat) {
     return chat.roomname === chatroom;
   });
   
-  for (let messages of chatsByRoomname) {
-      if (!isMalicious(array[i])) {
-        $('#chats').append(`<div class="postedMessages">${JSON.stringify(message)}</div>`);
+  for (let message of chatsByRoomname) {
+      if (!isMalicious(message)) {
+        $('#chats').append(`<div class="postedMessages">
+          <button class="username">${message.username}</button>
+          <span>${message.text}</span>
+          <div>chatroom:</div>
+          <button class = "room">${message.roomname}</button>
+          <div>sent at ${message.createdAt.substring(0, 19)}</div>
+          </div>`);
     }
   }
 }
-
-
-// need onclick handler to call 
-
-//setInterval(getNewMessages, 5000);
-getNewMessages();
-
 
 //Creating Usernames
   //initial load shows alert w/ prompt
@@ -164,42 +148,70 @@ getNewMessages();
       //edit url to reflect name
   //display username under header, next to text field & send button
 
+$(document).ready(function() {
+  
+  $('#sendMessage').on('submit', function(event) {
+    event.preventDefault();
+    let message = {}
+    message.username = 'Dr. Hannibal Lecter'; // CHANGE ME
+    message.text = $(this).closest('form').find('#inputPosts').val();
+    message.roomname = 'Asylum';
+    app.send(message);
+  
+  });
+  
+    // ONCLICK HANDLER FOR SUBMIT BUTTON TO RUN SELECTCHATROOM
+  $('#createRoom').on('submit', function(event) {
+    event.preventDefault();
+    let roomname = $(this).closest('form').find('#newChatroom').val();
+    //let option = addChatroom(roomname);
+    addChatroom(roomname);
+    
+    selectChatroom(roomname);
+    // enter new chatroom
+      // apply chatroom
+      //filter messages by room name
+    
+  });
+  
+  $(document).on('click',".username",function(event) {    
+    event.preventDefault();
+    let newFriend = $(this).text()
+    addFriendToList(newFriend) 
+    selectFriend(newFriend)
+    // apply chatroom
+      //filter messages by room name
+    
+  });
+  
+  $(document).on('click',".room",function(event) {
+    event.preventDefault();
+    let room = $(this).text()
+    selectChatroom(room) 
+    // apply chatroom
+      //filter messages by room name
+    
+  });
+  
+  function addFriendToList (friendName){
+    var x = document.getElementById('friends');
+    var option = document.createElement('option');
+    option.text = friendName;
+    x.add(option);
+    return option;
+  }
+  
+});
 
-
-
-
-
-
-
-
-
-
-
-
-// var request = $.get($.ajax[url]);
-//console.log(request);
-
-// sample messge format
-// var message = {
-//   username: 'shawndrost',
-//   text: 'trololo',
-//   roomname: '4chan'
-// };
-
-// Pseudocode for control flow
-// establish connection with api
-// ajax request to get data
-// check data for malicious code
-  // delete/ignore if <script>
-  // if not malicious, post message
+function selectFriend(friend) { //onclick
+  //app.fetch();
+  populateChatsByFriends(friend);
+}
   
   
+app.init();
   
-  
-  
-  
-  
-  
+
   
   
   

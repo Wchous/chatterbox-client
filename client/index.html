@@ -34,31 +34,36 @@
           <div>
             <button>Submit</button>
           </div>
-        </form> -->
-        <form>
+        </form> -->        
+        <form id="sendMessage">
           <div>
             <label for="makePost">Type a message: </label>
             <input type="text" id="inputPosts">
           </div>
           <div>
-            <button>Submit</button>
+            <button>Send</button>
           </div>
         </form>
-        <div>
+        <form id="createRoom">
           <div>
-            <div>Create a Chatroom </div>
-            <input type="text" id="inputPosts">
+            <label for="makePost">Enter new chatroom room</label>
+            <input type="text" id="newChatroom">
           </div>
           <div>
-            <button>Submit</button>
+            <button>Create New Chatroom</button>
           </div>
-        </div>
+        </form>
+        <div>Chatroom</div>
         <select name="selectRoom" id="chatroomMenu"> <!--Supplement an id here instead of using 'text'-->
           <option value="first" selected>Select a Chatroom</option> 
           <option value="second">Second Value</option>
           <option value="third">Third Value</option>
         </select>
       <!-- Your HTML goes here! -->
+        <div>Friends List</div>
+        <select name="friendsList" id="friends"> <!--Supplement an id here instead of using 'text'-->
+          <option value="defaultFriend" selected>Select a Friend</option>
+        </select>
     </div>
     <div id="chats"></div>
   </body>

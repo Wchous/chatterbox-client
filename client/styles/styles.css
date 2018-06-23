@@ -88,3 +88,12 @@ form input[type=text] {
     background-color: #0090da;
 }
 
+.postedMessages {
+    color: #4813d9;
+    border-style: solid;
+    background-color:#a62044;
+    padding: 3px;
+    border-color:#f52fcf;
+    border:display;
+}
+
