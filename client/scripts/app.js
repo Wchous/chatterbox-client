@@ -29,6 +29,14 @@ $('button').on('click', function() {
   
 });
 
+function addChatroom(text) {
+  var x = document.getElementById('chatroomMenu');
+  var option = document.createElement('option');
+  option.text = text;
+  a.add(option);
+  
+}
+
 // $.ajax({
 //   //dataType: "JSON",
 //   url: 'http://parse.atx.hackreactor.com/chatterbox/classes/messages',
@@ -61,6 +69,14 @@ $('button').on('click', function() {
 //     // $('#chats').append(JSON.stringify(data));
 //   }
 // });
+function isMalicious(tweet) {
+  for (let key in tweet) {
+    if (tweet[key].includes('<script>') || tweet[key].includes('src')) {
+        return true;
+    }
+  }
+  return false;
+}
 
 
 function getNewMessages (){
@@ -71,34 +87,24 @@ function getNewMessages (){
   url: 'http://parse.atx.hackreactor.com/chatterbox/classes/messages',
   type: "GET",
   //order: 'createdAt',
-  //data: { 'updatedAt': '2017-02-08T21:17:18.510Z'},
-  where : {"createdAt":{"$n":2018}},
+  data: 'order=-createdAt',
+  // where : {"createdAt":{"$n":2018}},
   // contentType: ,
   success: function(data) {
     //console.log(data.results);
-    let array = data.results.reverse();
+    let array = data.results;
     let approvedMessages = [];
     
     for (let i = 0; i < 20; i++) {
-      let malicious = false;
-      for (let key in array[i]) {
-        if (array[i][key].includes('<script>')) {
-          malicious = true;
-        }
-      }
-      if (!malicious) {
+      if (!isMalicious(array[i])) {
         approvedMessages.push(array[i]);
       }
-
     }
-    for (let message of approvedMessages) {
-        
+    
+    for (let message of approvedMessages) {    
       $('#chats').append(`<a>${JSON.stringify(message)}</a>`);
     }
     $("a").addClass("postedMessages")
-    // return data.results;
-    
-    // $('#chats').append(JSON.stringify(data));
     }
   });
 }
