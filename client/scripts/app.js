@@ -1,5 +1,8 @@
-// YOUR CODE HERE:
+//Chatterbot Code
 
+
+//Basic functions of chat: 
+  //initialize,send, fetch data,check malicious content
 let app = {};
 app.init = function() {
   app.fetch();
@@ -25,31 +28,6 @@ app.send = function(message) {
       console.error('chatterbox: Failed to send message', data);
     }
   });
-}
-
-function addChatroom(text) {
-  var x = document.getElementById('chatroomMenu');
-  var option = document.createElement('option');
-  option.text = text;
-  x.add(option);
-  return option;
-}
-
-function selectChatroom(chatroom) { //onclick
-  //var selectedRoom = chatroom.text();
-  // $(`select>option:eq(4)`).prop('selected', true);
-  //selectElement.text = selectedRoom;
-  //app.fetch();
-  populateChatsByChatroom(chatroom);
-}
-
-function isMalicious(tweet) {
-  for (let key in tweet) {
-    if (tweet[key].includes('<script>') || tweet[key].includes('src')) {
-        return true;
-    }
-  }
-  return false;
 }
 
 app.fetch = function(){
@@ -97,6 +75,53 @@ app.fetch = function(){
 });
 }
 
+function isMalicious(tweet) {
+  for (let key in tweet) {
+    if (tweet[key].includes('<script>') || tweet[key].includes('src')) {
+        return true;
+    }
+  }
+  return false;
+}
+
+//Chatroom: selection & creation
+function addChatroom(text) {
+  var x = document.getElementById('chatroomMenu');
+  var option = document.createElement('option');
+  option.text = text;
+  x.add(option);
+  return option;
+}
+
+function selectChatroom(chatroom) { //onclick
+  //var selectedRoom = chatroom.text();
+  // $(`select>option:eq(4)`).prop('selected', true);
+  //selectElement.text = selectedRoom;
+  //app.fetch();
+  populateChatsByChatroom(chatroom);
+}
+
+function populateChatsByChatroom(chatroom) {
+  $('.postedMessages').remove(); //MAYBE DELETE
+  
+  let chatsByRoomname = window.currentChats.filter(function(chat) {
+    return chat.roomname === chatroom;
+  });
+  
+  for (let message of chatsByRoomname) {
+      if (!isMalicious(message)) {
+        $('#chats').append(`<div class="postedMessages">
+          <button class="username">${message.username}</button>
+          <span>${message.text}</span>
+          <div>chatroom:</div>
+          <button class = "room">${message.roomname}</button>
+          <div>sent at ${message.createdAt.substring(0, 19)}</div>
+          </div>`);
+    }
+  }
+}
+
+//Friends: Selecting Friend and Filtering by Friends:
 
 function populateChatsByFriends(username) {
   $(".postedMessages").remove(); //MAYBE DELETE
@@ -120,36 +145,15 @@ function populateChatsByFriends(username) {
   
 }
 
-function populateChatsByChatroom(chatroom) {
-  $('.postedMessages').remove(); //MAYBE DELETE
-  
-  let chatsByRoomname = window.currentChats.filter(function(chat) {
-    return chat.roomname === chatroom;
-  });
-  
-  for (let message of chatsByRoomname) {
-      if (!isMalicious(message)) {
-        $('#chats').append(`<div class="postedMessages">
-          <button class="username">${message.username}</button>
-          <span>${message.text}</span>
-          <div>chatroom:</div>
-          <button class = "room">${message.roomname}</button>
-          <div>sent at ${message.createdAt.substring(0, 19)}</div>
-          </div>`);
-    }
-  }
+function selectFriend(friend) { //onclick
+  //app.fetch();
+  populateChatsByFriends(friend);
 }
 
-//Creating Usernames
-  //initial load shows alert w/ prompt
-    //user enters username
-      //store in array of users/assign other properties
-        //push to server?
-      //edit url to reflect name
-  //display username under header, next to text field & send button
+
+//Event Handlers:
 
 $(document).ready(function() {
-  
   $('#sendMessage').on('submit', function(event) {
     event.preventDefault();
     let message = {}
@@ -203,13 +207,31 @@ $(document).ready(function() {
   
 });
 
-function selectFriend(friend) { //onclick
-  //app.fetch();
-  populateChatsByFriends(friend);
-}
-  
-  
+
+//Initializing App after functions/event handlers run
+
 app.init();
+
+
+
+
+
+
+
+//Creating Usernames
+  //initial load shows alert w/ prompt
+    //user enters username
+      //store in array of users/assign other properties
+        //push to server?
+      //edit url to reflect name
+  //display username under header, next to text field & send button
+
+
+
+
+  
+  
+
   
 
   
